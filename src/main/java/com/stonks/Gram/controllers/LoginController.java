@@ -1,6 +1,7 @@
 package com.stonks.Gram.controllers;
 
 import java.io.StringReader;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +31,34 @@ public class LoginController {
         JsonReader reader = Json.createReader(new StringReader(User));
         JsonObject userObj = reader.readObject();
 
-        return ResponseEntity.ok(loginSvc.checkUser(userObj).toString());
+        Optional<JsonObject> checkUserObt = loginSvc.checkUser(userObj);
+
+        // return for invalid account creation
+        if(!checkUserObt.isEmpty())
+        {   return ResponseEntity.status(401).body(checkUserObt.get().toString());   } 
+
+        // return for account created
+        return ResponseEntity.status(201)
+                                .body(Json.createObjectBuilder()
+                                .add("msg", "Account created!")
+                                .build()
+                                .toString());
     }
 
 
     @PostMapping("/existingUser")
     public ResponseEntity<String> existingUser(@RequestBody String User){
 
-        return ResponseEntity.ok(null);
+        JsonReader reader = Json.createReader(new StringReader(User));
+        JsonObject userObj = reader.readObject();
+
+        Optional<JsonObject> loginOpt = loginSvc.login(userObj);
+        if(!loginOpt.isEmpty())
+        {   return ResponseEntity.status(401).body(loginOpt.get().toString());  }
+
+        return ResponseEntity.ok(Json.createObjectBuilder()
+                                .add("msg", "Login successful!")
+                                .build()
+                                .toString());
     }
 }
