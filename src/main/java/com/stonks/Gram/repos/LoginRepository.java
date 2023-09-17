@@ -5,9 +5,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import com.stonks.Gram.models.User;
+
 import static com.stonks.Gram.repos.Queries.*;
 
-import jakarta.json.JsonObject;
+
 
 @Repository
 public class LoginRepository {
@@ -16,10 +18,10 @@ public class LoginRepository {
     private JdbcTemplate jdbcTemplate;
 
 
-    public String checkUserAvail(JsonObject userObj){
+    public String checkUserAvail(User user){
         // if username available, return "yes"
 
-        SqlRowSet userRS = jdbcTemplate.queryForRowSet(SQL_FIND_USERNAME, userObj.getString("user"));
+        SqlRowSet userRS = jdbcTemplate.queryForRowSet(SQL_FIND_USERNAME, user.getUserId());
         if(userRS.next())
         {   return "no";    }
         
@@ -27,16 +29,16 @@ public class LoginRepository {
     }
 
 
-    public void createNewUser(JsonObject userObj){
-        jdbcTemplate.update(SQL_TEST_ADD_USER, userObj.getString("user"), userObj.getString("password"));
+    public void createNewUser(User user){
+        jdbcTemplate.update(SQL_TEST_ADD_USER, user.getUserId(), user.getPassword());
     }
 
 
-    public boolean validateLogin(JsonObject userObj){
+    public boolean validateLogin(User user){
 
         SqlRowSet userRS = jdbcTemplate.queryForRowSet(SQL_CHECK_LOGIN_CREDENTIALS, 
-                                                        userObj.getString("user"),
-                                                        userObj.getString("password"));
+                                                        user.getUserId(),
+                                                        user.getPassword());
         if(userRS.next()){  return true;    }
 
         return false;

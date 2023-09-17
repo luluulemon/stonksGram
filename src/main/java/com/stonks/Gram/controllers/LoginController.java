@@ -1,6 +1,5 @@
 package com.stonks.Gram.controllers;
 
-import java.io.StringReader;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.stonks.Gram.models.User;
 import com.stonks.Gram.services.LoginService;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
 
 @RestController
 @RequestMapping("/api/login")
@@ -26,16 +25,13 @@ public class LoginController {
     private LoginService loginSvc;
 
     @PostMapping("/newUser")
-    public ResponseEntity<String> createNewUser(@RequestBody String User){
+    public ResponseEntity<String> createNewUser(@RequestBody User user){
 
-        JsonReader reader = Json.createReader(new StringReader(User));
-        JsonObject userObj = reader.readObject();
-
-        Optional<JsonObject> checkUserObt = loginSvc.checkUser(userObj);
+        Optional<JsonObject> checkUserOpt = loginSvc.checkUser(user);
 
         // return for invalid account creation
-        if(!checkUserObt.isEmpty())
-        {   return ResponseEntity.status(401).body(checkUserObt.get().toString());   } 
+        if(!checkUserOpt.isEmpty())
+        {   return ResponseEntity.status(401).body(checkUserOpt.get().toString());   } 
 
         // return for account created
         return ResponseEntity.status(201)
@@ -47,12 +43,12 @@ public class LoginController {
 
     // test add
     @PostMapping("/existingUser")
-    public ResponseEntity<String> existingUser(@RequestBody String User){
+    public ResponseEntity<String> existingUser(@RequestBody User user){
 
-        JsonReader reader = Json.createReader(new StringReader(User));
-        JsonObject userObj = reader.readObject();
+        // JsonReader reader = Json.createReader(new StringReader(User));
+        // JsonObject userObj = reader.readObject();
 
-        Optional<JsonObject> loginOpt = loginSvc.login(userObj);
+        Optional<JsonObject> loginOpt = loginSvc.login(user);
         if(!loginOpt.isEmpty())
         {   return ResponseEntity.status(401).body(loginOpt.get().toString());  }
 
