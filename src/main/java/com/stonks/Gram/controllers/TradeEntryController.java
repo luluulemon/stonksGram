@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.stonks.Gram.models.Trade;
 import com.stonks.Gram.services.TradeEntryService;
 
 @RestController
@@ -38,14 +39,21 @@ public class TradeEntryController {
 
 
     @PostMapping(path="/uploads3", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> postUploadToS3Test (@RequestPart MultipartFile[] myfiles, 
-                                                    @RequestPart String notes){
+    public ResponseEntity<String> postUploadToS3Test (@RequestPart MultipartFile[] tradePics, 
+                                                    @RequestPart Trade trade){
         
-        Arrays.asList(myfiles).stream().forEach(file -> {
-            tradeEntrySvc.uploadToS3(file);  
-        });
+        System.out.println(trade.toString());                                               
+        if(!tradeEntrySvc.checkTradeEntry(tradePics, trade))
+        {   return ResponseEntity.ok("Incomplete trade entry"); }                                                
+
+        tradeEntrySvc.uploadTrade(tradePics, trade);  
         
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok("Upload Complete");
     }
+
+
+    // end point for edit
+
+    // end point for delete
 
 }

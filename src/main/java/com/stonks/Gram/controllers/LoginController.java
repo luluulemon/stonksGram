@@ -29,7 +29,7 @@ public class LoginController {
 
         // return for invalid account creation
         if(!checkUserOpt.isEmpty())
-        {   return ResponseEntity.status(401).body(checkUserOpt.get().toString());   } 
+        {   return ResponseEntity.status(200).body(checkUserOpt.get().toString());   } 
 
         // return for account created
         return ResponseEntity.status(201)
@@ -42,9 +42,6 @@ public class LoginController {
     // test add
     @PostMapping("/existingUser")
     public ResponseEntity<String> existingUser(@RequestBody User user){
-
-        // JsonReader reader = Json.createReader(new StringReader(User));
-        // JsonObject userObj = reader.readObject();
 
         Optional<JsonObject> loginOpt = loginSvc.login(user);
         if(!loginOpt.isEmpty())
