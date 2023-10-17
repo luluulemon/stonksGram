@@ -1,6 +1,7 @@
 package com.stonks.Gram.models;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,18 +10,27 @@ import lombok.Setter;
 @Setter
 public class Trade {
     
-    private long tradeId;
+    private String tradeId;
     private Date entryDate;
     private Date exitDate;
     private double entryPrice;
     private double exitPrice;
-    private int entrySize;
+    private int tradeSize;
+    private String tradeType;
     private String comments;
+    private String tradePicsList;
+    private double pnL;
+    
+    
+
+    public Trade() {}
+
 
     @Override
     public String toString() {
-        return "Trade [entryDate=" + entryDate + ", exitDate=" + exitDate + ", entryPrice=" + entryPrice
-                + ", exitPrice=" + exitPrice + ", entrySize=" + entrySize + ", comments=" + comments + "]";
+        return "Trade [tradeId=" + tradeId + ", entryDate=" + entryDate + ", exitDate=" + exitDate + ", entryPrice="
+                + entryPrice + ", exitPrice=" + exitPrice + ", tradeSize=" + tradeSize + ", tradeType=" + tradeType
+                + ", comments=" + comments + ", tradePicsList=" + tradePicsList + ", pnL=" + pnL + "]";
     }
    
     

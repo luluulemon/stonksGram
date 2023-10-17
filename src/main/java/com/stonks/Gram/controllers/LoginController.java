@@ -1,5 +1,6 @@
 package com.stonks.Gram.controllers;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.stonks.Gram.models.Trade;
 import com.stonks.Gram.models.User;
 import com.stonks.Gram.services.LoginService;
+import com.stonks.Gram.services.TradeEntryService;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -21,6 +24,8 @@ public class LoginController {
     
     @Autowired
     private LoginService loginSvc;
+    @Autowired
+    private TradeEntryService tradeSvc;
 
     @PostMapping("/newUser")
     public ResponseEntity<String> createNewUser(@RequestBody User user){
@@ -39,17 +44,15 @@ public class LoginController {
                                 .toString());
     }
 
-    // test add
+
     @PostMapping("/existingUser")
-    public ResponseEntity<String> existingUser(@RequestBody User user){
+    public ResponseEntity<List<Trade>> existingUser(@RequestBody User user){
 
         Optional<JsonObject> loginOpt = loginSvc.login(user);
         if(!loginOpt.isEmpty())
-        {   return ResponseEntity.status(401).body(loginOpt.get().toString());  }
+        {   return ResponseEntity.status(200).body(null);  }
 
-        return ResponseEntity.ok(Json.createObjectBuilder()
-                                .add("msg", "Login successful!")
-                                .build()
-                                .toString());
+        // return list of trades after successful login
+        return ResponseEntity.ok(tradeSvc.loadTrades(user));
     }
 }
