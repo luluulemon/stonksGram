@@ -45,7 +45,7 @@ public class TradeEntryController {
 
     @PostMapping(path="/uploadTrade", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadTrade (@RequestPart MultipartFile[] tradePics, 
-                                                    @RequestPart Trade trade){
+                                                    @RequestPart com.stonks.Gram.entities.Trade trade){
         
         System.out.println(trade.toString());                                               
         if(!tradeSvc.checkTradeEntry(tradePics, trade))
@@ -60,7 +60,7 @@ public class TradeEntryController {
     // end point for edit
     @PutMapping(path="updateTrade", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateTrade(@RequestPart MultipartFile[] tradePics, 
-                                                    @RequestPart Trade trade){
+                                                    @RequestPart com.stonks.Gram.entities.Trade trade){
         
         if(!tradeSvc.checkTradeEntry(tradePics, trade))
         {   return ResponseEntity.ok("Incomplete trade entry"); }    
@@ -73,7 +73,7 @@ public class TradeEntryController {
 
     // end point for delete
     @DeleteMapping(path="deleteTrade")
-    public ResponseEntity<String> deleteTrade(@RequestPart Trade trade){
+    public ResponseEntity<String> deleteTrade(@RequestPart com.stonks.Gram.entities.Trade trade){
         tradeSvc.deleteTrade(trade);
         return ResponseEntity.ok("Post deleted");
     }

@@ -11,11 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.stonks.Gram.models.Trade;
+import com.stonks.Gram.entities.Trade;
 import com.stonks.Gram.models.User;
 import com.stonks.Gram.repos.TradeRepository;
 import com.stonks.Gram.utils.S3util;
@@ -63,7 +60,6 @@ public class TradeEntryService {
             objectMetadata.setContentLength(pic.getSize());
             objectMetadata.setContentType(pic.getContentType());
 
-
             //Save Image in S3
             String path = String.format("%s/%s", bucketName, trade.getTradeId());
 
@@ -80,11 +76,11 @@ public class TradeEntryService {
 
         // upload to trade table
         trade.setTradePicsList(tradePicsList);
-        tradeRepo.saveTrade(trade);
+        tradeRepo.saveTradeJpa(trade);
     }
 
 
-    // Validation for trade details: Pic upload and trade details
+    // Validation for trade details: Pic upload (fileType) and minimum required trade details
     public boolean checkTradeEntry(MultipartFile[] tradePics, Trade trade){
 
         // Check file type to be image, minimum one pic
@@ -119,12 +115,13 @@ public class TradeEntryService {
 
 
     public List<Trade> loadTrades(User user){
-        return tradeRepo.loadTrades(user);
+        return tradeRepo.loadTradesJpa(user);
     }
 
 
     public void deleteTrade(Trade trade){
-        tradeRepo.deleteTrade(trade);
+        s3util.deleteS3folder(trade, "gramtest1");
+        tradeRepo.deleteTradeJpa(trade.getTradeId());
     }
 
 
@@ -132,18 +129,15 @@ public class TradeEntryService {
         
         String bucketName = "gramtest1";
         // validate tradeId exists
-        if(!tradeRepo.findTradeById(trade))
-        {   
-            System.out.println("Id no exists");
-            return; 
-        }
+        if(tradeRepo.findTradeByIdJpa(trade.getTradeId()) == null)
+        {   System.out.println("Id no exists");
+            return;    }
 
         // delete old folder
         s3util.deleteS3folder(trade, bucketName);
 
         // update new pics
-        String tradePicsList = "";
-        
+        String tradePicsList = "";  // For list of pics, to be saved
         for(MultipartFile pic: tradePics){
 
             //get file metadata
@@ -166,7 +160,7 @@ public class TradeEntryService {
 
         // upload to trade table
         trade.setTradePicsList(tradePicsList);
-        tradeRepo.updateTrade(trade);
+        tradeRepo.updateTradeJpa(trade);
     }
 
 }

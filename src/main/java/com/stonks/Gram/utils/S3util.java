@@ -14,7 +14,7 @@ import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.stonks.Gram.models.Trade;
+import com.stonks.Gram.entities.Trade;
 
 
 @Service

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.stonks.Gram.models.Trade;
+import com.stonks.Gram.entities.Trade;
 import com.stonks.Gram.models.User;
 import com.stonks.Gram.services.LoginService;
 import com.stonks.Gram.services.TradeEntryService;
