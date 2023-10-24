@@ -1,22 +1,22 @@
 package com.stonks.Gram.controllers;
 
-import java.io.StringReader;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.stonks.Gram.entities.Trade;
+import com.stonks.Gram.models.User;
 import com.stonks.Gram.services.LoginService;
+import com.stonks.Gram.services.TradeEntryService;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
 
 @RestController
 @RequestMapping("/api/login")
@@ -24,18 +24,17 @@ public class LoginController {
     
     @Autowired
     private LoginService loginSvc;
+    @Autowired
+    private TradeEntryService tradeSvc;
 
     @PostMapping("/newUser")
-    public ResponseEntity<String> createNewUser(@RequestBody String User){
+    public ResponseEntity<String> createNewUser(@RequestBody User user){
 
-        JsonReader reader = Json.createReader(new StringReader(User));
-        JsonObject userObj = reader.readObject();
-
-        Optional<JsonObject> checkUserObt = loginSvc.checkUser(userObj);
+        Optional<JsonObject> checkUserOpt = loginSvc.checkUser(user);
 
         // return for invalid account creation
-        if(!checkUserObt.isEmpty())
-        {   return ResponseEntity.status(401).body(checkUserObt.get().toString());   } 
+        if(!checkUserOpt.isEmpty())
+        {   return ResponseEntity.status(200).body(checkUserOpt.get().toString());   } 
 
         // return for account created
         return ResponseEntity.status(201)
@@ -47,18 +46,13 @@ public class LoginController {
 
 
     @PostMapping("/existingUser")
-    public ResponseEntity<String> existingUser(@RequestBody String User){
+    public ResponseEntity<List<Trade>> existingUser(@RequestBody User user){
 
-        JsonReader reader = Json.createReader(new StringReader(User));
-        JsonObject userObj = reader.readObject();
-
-        Optional<JsonObject> loginOpt = loginSvc.login(userObj);
+        Optional<JsonObject> loginOpt = loginSvc.login(user);
         if(!loginOpt.isEmpty())
-        {   return ResponseEntity.status(401).body(loginOpt.get().toString());  }
+        {   return ResponseEntity.status(200).body(null);  }
 
-        return ResponseEntity.ok(Json.createObjectBuilder()
-                                .add("msg", "Login successful!")
-                                .build()
-                                .toString());
+        // return list of trades after successful login
+        return ResponseEntity.ok(tradeSvc.loadTrades(user));
     }
 }

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.stonks.Gram.models.User;
 import com.stonks.Gram.repos.LoginRepository;
 
 import jakarta.json.Json;
@@ -18,10 +19,10 @@ public class LoginService {
     @Autowired
     private LoginRepository loginRepo;
 
-    public Optional<JsonObject> checkUser(JsonObject userObj){
+    public Optional<JsonObject> checkUser(User user){
         
         // Check for username length
-        if(userObj.getString("user").length() < 4)
+        if(user.getUserId().length() < 4)
         {   System.out.println("Username too short");   
             return Optional.of(Json.createObjectBuilder()
                         .add("msg", "Please choose username with at least 4 chars")
@@ -29,7 +30,7 @@ public class LoginService {
         }
 
         // Check for password length
-        if(userObj.getString("password").length() < 8)
+        if(user.getPassword().length() < 8)
         {   System.out.println("Password too short");   
             return Optional.of(Json.createObjectBuilder()
                         .add("msg", "Please choose password with at least 8 chars")
@@ -42,7 +43,7 @@ public class LoginService {
         // Create a Pattern object
         Pattern regexPattern = Pattern.compile(pattern);
         // Create a Matcher object
-        Matcher matcher = regexPattern.matcher(userObj.getString("password"));
+        Matcher matcher = regexPattern.matcher(user.getPassword());
 
         if( !matcher.matches()) // if regex not matched
         {   return Optional.of(Json.createObjectBuilder()
@@ -51,7 +52,7 @@ public class LoginService {
         }
 
         // If format valid, check for username availability
-        if(loginRepo.checkUserAvail(userObj).equals("no"))
+        if(loginRepo.checkUserAvail(user).equals("no"))
         {   
             return Optional.of(Json.createObjectBuilder()
                         .add("msg", "Username not available")
@@ -60,25 +61,25 @@ public class LoginService {
 
         
         // valid Username & password, create new User
-        loginRepo.createNewUser(userObj);
+        loginRepo.createNewUser(user);
         return Optional.empty();
     }
 
 
 
 
-    public Optional<JsonObject> login(JsonObject userObj){
+    public Optional<JsonObject> login(User user){
         
         // Check for password regex (Uppercase, Lowercase, and number)
         String pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).+$";
         // Create a Pattern object
         Pattern regexPattern = Pattern.compile(pattern);
         // Create a Matcher object
-        Matcher matcher = regexPattern.matcher(userObj.getString("password"));
+        Matcher matcher = regexPattern.matcher(user.getPassword());
 
         // Check for username length
-        if(userObj.getString("user").length() < 4 || 
-            userObj.getString("password").length() < 8 ||
+        if(user.getUserId().length() < 4 || 
+            user.getPassword().length() < 8 ||
             !matcher.matches()
             )
         {   System.out.println("Username/password format is wrong");   
@@ -89,7 +90,7 @@ public class LoginService {
 
     
         // valid Username & password format, check loginCredentials
-        if(!loginRepo.validateLogin(userObj))
+        if(!loginRepo.validateLogin(user))
         {   return Optional.of(Json.createObjectBuilder()
                         .add("msg", "Wrong username or password")
                         .build());  };
