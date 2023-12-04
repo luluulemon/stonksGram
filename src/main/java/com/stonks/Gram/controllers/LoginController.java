@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,8 +47,10 @@ public class LoginController {
     }
 
 
+    @CrossOrigin(origins="*", allowedHeaders = "*")
     @PostMapping("/existingUser")
     public ResponseEntity<List<Trade>> existingUser(@RequestBody User user){
+        System.out.println("It got to the endpoint");
 
         Optional<JsonObject> loginOpt = loginSvc.login(user);
         if(!loginOpt.isEmpty())
@@ -55,4 +59,12 @@ public class LoginController {
         // return list of trades after successful login
         return ResponseEntity.ok(tradeSvc.loadTrades(user));
     }
+
+
+    @CrossOrigin(origins="*", allowedHeaders = "*")
+    @GetMapping("/test")
+    public ResponseEntity<String> testPoint(){
+        return ResponseEntity.ok("test test");
+    }
+
 }
